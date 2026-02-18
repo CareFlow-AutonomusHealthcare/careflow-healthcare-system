@@ -1,5 +1,3 @@
-
-Gemini said
 CareFlow — Autonomous Healthcare Coordination System
 CareFlow is a backend-heavy automation system designed to proactively detect high-risk patients by analyzing clinical and behavioral trends. Unlike traditional dashboards that only alert staff, CareFlow proposes specific care actions (like follow-ups or escalations) and manages the workflow through a Human-in-the-Loop (HITL) approval process.
 +4
@@ -84,3 +82,4 @@ Moderate Risk (5–8)
 
 
 High Risk (≥ 9): Automatically triggers an Action Proposal for doctor review
+
