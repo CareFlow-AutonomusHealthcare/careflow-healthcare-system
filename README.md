@@ -1,85 +1,49 @@
-CareFlow — Autonomous Healthcare Coordination System
-CareFlow is a backend-heavy automation system designed to proactively detect high-risk patients by analyzing clinical and behavioral trends. Unlike traditional dashboards that only alert staff, CareFlow proposes specific care actions (like follow-ups or escalations) and manages the workflow through a Human-in-the-Loop (HITL) approval process.
-+4
+# 🏥 CareFlow — Autonomous Healthcare Coordination System
 
-🚀 The Problem & Solution
+[cite_start]CareFlow is an autonomous healthcare coordination system that proactively detects high-risk patients by analyzing behavioral and clinical trends over 30–90 day windows[cite: 1, 125]. [cite_start]The system monitors patient data—such as missed appointments and lab results—to calculate a weighted risk score and generate proposed care actions[cite: 7, 8]. [cite_start]By integrating a Human-in-the-Loop (HITL) workflow, it ensures that all escalations and scheduling tasks are reviewed by medical staff while maintaining a full, immutable audit trail for compliance[cite: 8, 125].
 
-The Problem: Healthcare systems are reactive; patients fall through the cracks due to missed appointments and worsening lab results that aren't caught until a costly readmission occurs.
+---
 
+## 🚀 The Problem & Solution
+* [cite_start]**The Problem:** Healthcare systems are often reactive; patients fall through the cracks due to missed appointments and worsening lab results that aren't caught until a costly readmission occurs[cite: 3, 4].
+* [cite_start]**The Solution:** An autonomous engine that monitors patient history, calculates risk scores based on longitudinal patterns, and automates coordination after clinical approval[cite: 7, 8, 140].
 
-The Solution: An autonomous engine that monitors patient history, calculates risk scores based on longitudinal patterns, and automates coordination after clinical approval.
-+1
+---
 
-🛠️ Tech Stack
-Language: Python 3.x
+## 🛠️ Tech Stack
+* [cite_start]**Language:** Python 3.x [cite: 66]
+* [cite_start]**Backend Framework:** **FastAPI** (High-performance, asynchronous REST APIs) [cite: 66]
+* [cite_start]**Database:** **MySQL** (Relational storage for clinical data and JSON-based audit logs) [cite: 83]
+* **Frontend Styling:** **Tailwind CSS** (Utility-first CSS for the coordination dashboard)
+* [cite_start]**Architecture:** Event-driven, stateless APIs with a dedicated Risk Scoring Engine [cite: 15, 59]
 
+---
 
-Framework: FastAPI (High-performance, asynchronous REST APIs) 
-+1
+## 📊 Database Architecture (MySQL)
+[cite_start]The system uses a MySQL instance with optimized schemas for clinical history and a specialized audit trail using JSON payloads[cite: 83, 96].
 
+### Key Tables:
+* [cite_start]**`patients`**: Core identity and chronic condition context[cite: 85].
+* [cite_start]**`appointments`**: Tracks engagement patterns (Attended, Missed, Cancelled)[cite: 86].
+* [cite_start]**`labs`**: Stores clinical observations for trend detection (e.g., HbA1c, Blood Pressure)[cite: 88].
+* [cite_start]**`risk_scores`**: Stores the output of the scoring engine with automated reasoning strings[cite: 91, 92].
+* [cite_start]**`action_proposals`**: Managed through a state machine (Pending → Approved/Rejected)[cite: 92, 93].
+* [cite_start]**`audit_logs`**: Immutable records of every system change using JSON payloads[cite: 96, 98].
 
-Database: MySQL (Relational storage for clinical data and JSON-based audit logs) 
+---
 
+## 🧠 Risk Scoring Logic
+[cite_start]The engine evaluates patients over a **30–90 day window** using a weighted composite model[cite: 125, 136]:
 
-Architecture: Event-driven, stateless APIs with a dedicated Decision Engine 
-+2
+**Risk Score = (W₁ × Engagement) + (W₂ × Clinical) + (W₃ × Chronic Severity) + (W₄ × Instability)**
 
-📊 Database Architecture (MySQL)
-The system uses a single MySQL instance with optimized schemas for clinical history and a specialized audit trail using JSON payloads.
-+1
+* [cite_start]**Engagement Trend:** Based on missed appointment ratios and consecutive absences[cite: 132].
+* [cite_start]**Clinical Trend:** Calculated as a percentage change ($\% \Delta$) between the current average and historical average of lab values[cite: 133, 134].
+* [cite_start]**Instability:** Uses standard deviation ($\sigma$) to detect volatile physiological control[cite: 135].
+* [cite_start]**Thresholds:** A score $\ge$ 9 automatically triggers an **Action Proposal** for doctor review[cite: 136].
 
-Key Tables:
+---
 
-patients: Core identity and chronic condition context.
-
-
-appointments: Tracks engagement patterns (Attended vs. Missed).
-
-
-labs: Stores clinical observations (e.g., HbA1c, Blood Pressure).
-
-
-risk_scores: Stores the output of the scoring engine with reasoning strings.
-
-
-action_proposals: Managed through a state machine (Pending → Approved/Rejected).
-
-
-audit_logs: Immutable records of every system change using old_payload and new_payload JSON columns.
-+1
-
-🧠 Risk Scoring Logic
-The system evaluates patients over a 30–90 day window using a weighted composite model:
-+1
-
-RiskScore=(W 
-1
-​
- ×Engagement)+(W 
-2
-​
- ×Clinical)+(W 
-3
-​
- ×Severity)+(W 
-4
-​
- ×Instability)
-
-Engagement: Based on missed appointment ratios and consecutive absences.
-
-
-Clinical: Calculated as a percentage change (%Δ) between the current average and historical average of lab values.
-
-
-Instability: Uses standard deviation (σ) to detect volatile physiological control.
-
-Thresholds:
-
-Low Risk (0–4)
-
-Moderate Risk (5–8)
-
-
-High Risk (≥ 9): Automatically triggers an Action Proposal for doctor review
-
+## 📈 Scalability & Impact
+* [cite_start]**Technical**: Stateless API design allows the system to scale from a single clinic to regional hospital networks[cite: 17, 59].
+* [cite_start]**Operational**: Reduces manual coordination errors and staff workload while providing a clear audit trail for compliance[cite: 19, 141].
