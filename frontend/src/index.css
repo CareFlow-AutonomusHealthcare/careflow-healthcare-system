@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-clinical-900: #0B1120;
+  --color-clinical-800: #111827;
+  --color-clinical-700: #1F2937;
+  --color-clinical-border: #374151;
+  --color-clinical-accent: #3B82F6;
+  --color-clinical-success: #10B981;
+  --color-clinical-warning: #F59E0B;
+  --color-clinical-danger: #EF4444;
+}
+
+@layer base {
+  body {
+    @apply bg-clinical-900 text-gray-100 font-sans antialiased;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-clinical-800/80 backdrop-blur-md border border-clinical-border rounded-xl shadow-2xl;
+  }
+  
+  .clinical-btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2;
+  }
+  
+  .clinical-btn-primary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 bg-clinical-accent text-white shadow-lg;
+  }
+  .clinical-btn-primary:hover {
+    @apply bg-blue-600;
+  }
+  
+  .clinical-btn-success {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 bg-clinical-success text-white shadow-lg;
+  }
+  .clinical-btn-success:hover {
+    @apply bg-emerald-600;
+  }
+  
+  .clinical-btn-danger {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 bg-clinical-danger text-white shadow-lg;
+  }
+  .clinical-btn-danger:hover {
+    @apply bg-red-600;
+  }
+  
+  .clinical-btn-outline {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border border-clinical-border text-gray-300;
+  }
+  .clinical-btn-outline:hover {
+    @apply bg-clinical-700;
+  }
+}
+
+/* Custom Scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F2937;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
