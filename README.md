@@ -1,6 +1,6 @@
 # 🏥 CareFlow — Autonomous Healthcare Coordination System
 
-[cite_start]CareFlow is an autonomous healthcare coordination system that proactively detects high-risk patients by analyzing behavioral and clinical trends over 30–90 day windows[cite: 1, 125]. [cite_start]The system monitors patient data—such as missed appointments and lab results—to calculate a weighted risk score and generate proposed care actions[cite: 7, 8]. [cite_start]By integrating a Human-in-the-Loop (HITL) workflow, it ensures that all escalations and scheduling tasks are reviewed by medical staff while maintaining a full, immutable audit trail for compliance[cite: 8, 125].
+CareFlow is an autonomous healthcare coordination system that proactively detects high-risk patients by analyzing behavioral and clinical trends over 30–90 day windows[cite: 1, 125]. [cite_start]The system monitors patient data—such as missed appointments and lab results—to calculate a weighted risk score and generate proposed care actions[cite: 7, 8]. [cite_start]By integrating a Human-in-the-Loop (HITL) workflow, it ensures that all escalations and scheduling tasks are reviewed by medical staff while maintaining a full, immutable audit trail for compliance[cite: 8, 125].
 
 ---
 
