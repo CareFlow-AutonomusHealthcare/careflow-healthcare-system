@@ -1,49 +1,167 @@
 # 🏥 CareFlow — Autonomous Healthcare Coordination System
 
-CareFlow is an autonomous healthcare coordination system that proactively detects high-risk patients by analyzing behavioral and clinical trends over 30–90 day windows[cite: 1, 125]. [cite_start]The system monitors patient data—such as missed appointments and lab results—to calculate a weighted risk score and generate proposed care actions[cite: 7, 8]. [cite_start]By integrating a Human-in-the-Loop (HITL) workflow, it ensures that all escalations and scheduling tasks are reviewed by medical staff while maintaining a full, immutable audit trail for compliance[cite: 8, 125].
+CareFlow is an autonomous healthcare coordination system that proactively detects high-risk patients by analyzing behavioral and clinical trends over 30–90 day windows. It features a full role-based access control system with three distinct portals for Doctors, Staff Coordinators, and Administrators.
 
 ---
 
 ## 🚀 The Problem & Solution
-* [cite_start]**The Problem:** Healthcare systems are often reactive; patients fall through the cracks due to missed appointments and worsening lab results that aren't caught until a costly readmission occurs[cite: 3, 4].
-* [cite_start]**The Solution:** An autonomous engine that monitors patient history, calculates risk scores based on longitudinal patterns, and automates coordination after clinical approval[cite: 7, 8, 140].
+
+**The Problem:** Healthcare systems are often reactive — patients fall through the cracks due to missed appointments and worsening lab results that aren't caught until a costly readmission occurs.
+
+**The Solution:** An autonomous engine that monitors patient history, calculates risk scores based on longitudinal patterns, and routes proposed actions through a Human-in-the-Loop (HITL) workflow for clinical approval — with a full immutable audit trail.
 
 ---
 
 ## 🛠️ Tech Stack
-* [cite_start]**Language:** Python 3.x [cite: 66]
-* [cite_start]**Backend Framework:** **FastAPI** (High-performance, asynchronous REST APIs) [cite: 66]
-* [cite_start]**Database:** **MySQL** (Relational storage for clinical data and JSON-based audit logs) [cite: 83]
-* **Frontend Styling:** **Tailwind CSS** (Utility-first CSS for the coordination dashboard)
-* [cite_start]**Architecture:** Event-driven, stateless APIs with a dedicated Risk Scoring Engine [cite: 15, 59]
+
+| Layer | Technology |
+|---|---|
+| Backend | Python 3.11, FastAPI |
+| Database | MySQL 8.0 |
+| ORM | SQLAlchemy 2.0 |
+| Auth | JWT (python-jose), plain-text passwords |
+| Frontend | React 19, Vite, Tailwind CSS v4 |
+| Charts | Recharts |
+| HTTP Client | Axios |
 
 ---
 
-## 📊 Database Architecture (MySQL)
-[cite_start]The system uses a MySQL instance with optimized schemas for clinical history and a specialized audit trail using JSON payloads[cite: 83, 96].
+## 👥 User Roles & Portals
 
-### Key Tables:
-* [cite_start]**`patients`**: Core identity and chronic condition context[cite: 85].
-* [cite_start]**`appointments`**: Tracks engagement patterns (Attended, Missed, Cancelled)[cite: 86].
-* [cite_start]**`labs`**: Stores clinical observations for trend detection (e.g., HbA1c, Blood Pressure)[cite: 88].
-* [cite_start]**`risk_scores`**: Stores the output of the scoring engine with automated reasoning strings[cite: 91, 92].
-* [cite_start]**`action_proposals`**: Managed through a state machine (Pending → Approved/Rejected)[cite: 92, 93].
-* [cite_start]**`audit_logs`**: Immutable records of every system change using JSON payloads[cite: 96, 98].
+### 🩺 Doctor Portal
+- View full 90-day patient history (labs + appointments)
+- Review AI-generated risk proposals
+- Approve, reject, or approve/reject with clinical comments
 
----
+### 🗂️ Staff Coordinator Portal
+- View all present patients
+- Monitor doctor and nursing staff shift presence
+- View all resolved decisions made by doctors
 
-## 🧠 Risk Scoring Logic
-[cite_start]The engine evaluates patients over a **30–90 day window** using a weighted composite model[cite: 125, 136]:
-
-**Risk Score = (W₁ × Engagement) + (W₂ × Clinical) + (W₃ × Chronic Severity) + (W₄ × Instability)**
-
-* [cite_start]**Engagement Trend:** Based on missed appointment ratios and consecutive absences[cite: 132].
-* [cite_start]**Clinical Trend:** Calculated as a percentage change ($\% \Delta$) between the current average and historical average of lab values[cite: 133, 134].
-* [cite_start]**Instability:** Uses standard deviation ($\sigma$) to detect volatile physiological control[cite: 135].
-* [cite_start]**Thresholds:** A score $\ge$ 9 automatically triggers an **Action Proposal** for doctor review[cite: 136].
+### 🔐 Admin Portal
+- Full system dashboard with risk overview
+- User management — add, edit, disable, delete doctors/staff/admins
+- Inventory management — view and update stock levels
+- All proposals — filterable history of every risk proposal
+- Audit logs — immutable JSON payload log of every DB change
 
 ---
 
-## 📈 Scalability & Impact
-* [cite_start]**Technical**: Stateless API design allows the system to scale from a single clinic to regional hospital networks[cite: 17, 59].
-* [cite_start]**Operational**: Reduces manual coordination errors and staff workload while providing a clear audit trail for compliance[cite: 19, 141].
+## 🗄️ Database Schema
+
+| Table | Purpose |
+|---|---|
+| `users` | Auth credentials and role assignments |
+| `departments` | Hospital departments |
+| `doctors` | Doctor profiles linked to departments |
+| `nursing_staff` | Staff profiles with shift assignments |
+| `inventory` | Equipment stock per department |
+| `staffing_capacity` | Current vs required staff per shift |
+| `patients` | Patient identity and chronic conditions |
+| `appointments` | Engagement tracking (Attended/Missed/Cancelled) |
+| `labs` | Clinical lab results for trend analysis |
+| `risk_scores` | Composite risk scores from the engine |
+| `action_proposals` | HITL workflow state machine (Pending → Approved/Rejected) |
+| `decisions` | Immutable doctor decisions with optional comments |
+| `audit_logs` | Full JSON payload audit trail via MySQL triggers |
+
+---
+
+## 🧠 Risk Scoring Formula
+
+```
+RiskScore = (W1 × Engagement) + (W2 × Clinical) + (W3 × Chronic) + (W4 × Instability)
+
+Weights: W1=1.5, W2=3.0, W3=1.0, W4=0.5
+Thresholds: Score ≥ 9.0 → Escalate | Score ≥ 5.0 → Follow-up
+```
+
+---
+
+## ⚡ Quick Start
+
+### Prerequisites
+- Python 3.11
+- Node.js 18+
+- MySQL 8.0 running locally
+
+### 1. Database Setup
+```bash
+sudo mysql -e "
+CREATE DATABASE IF NOT EXISTS careflow_db;
+CREATE USER IF NOT EXISTS 'careflow_user'@'localhost' IDENTIFIED BY 'careflow_password';
+GRANT ALL PRIVILEGES ON careflow_db.* TO 'careflow_user'@'localhost';
+FLUSH PRIVILEGES;
+"
+sudo mysql careflow_db < backend/schema.sql
+```
+
+### 2. Start Backend (Terminal 1)
+```bash
+cd ~/Desktop/careflow
+backend/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+### 3. Start Frontend (Terminal 2)
+```bash
+cd ~/Desktop/careflow/frontend
+npm run dev
+```
+
+### 4. Open in Browser
+```
+http://localhost:5173
+```
+
+---
+
+## 🔑 Default Credentials
+
+| Username | Password | Role |
+|---|---|---|
+| `admin` | `admin123` | Administrator |
+| `dr_smith` | `doctor123` | Doctor |
+| `dr_jones` | `doctor123` | Doctor |
+| `staff_coord` | `staff123` | Staff Coordinator |
+
+---
+
+## 🌱 Seed Dummy Data
+
+To populate 100 patients, 20 doctors, 70 staff, and full inventory:
+```bash
+backend/venv/bin/python3 backend/seed_data.py
+```
+
+Then log in as admin and click **Run Risk Engine** to generate proposals.
+
+---
+
+## 📁 Project Structure
+
+```
+careflow/
+├── backend/
+│   ├── main.py          # FastAPI routes
+│   ├── models.py        # SQLAlchemy models
+│   ├── schemas.py       # Pydantic schemas
+│   ├── auth.py          # JWT auth + role guards
+│   ├── database.py      # DB connection
+│   ├── schema.sql       # MySQL schema + seed users
+│   ├── seed_data.py     # Full dummy data seeder
+│   └── seed_users.py    # User-only seeder
+├── frontend/
+│   └── src/
+│       ├── context/AuthContext.jsx
+│       ├── components/
+│       │   ├── DoctorLayout.jsx
+│       │   ├── StaffLayout.jsx
+│       │   └── AdminLayout.jsx
+│       └── pages/
+│           ├── LoginPage.jsx
+│           ├── doctor/
+│           ├── staff/
+│           └── admin/
+├── start.sh             # One-command backend starter
+└── docker-compose.yml   # MySQL via Docker (optional)
+```

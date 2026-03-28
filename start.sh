@@ -5,7 +5,7 @@
 echo "Starting CareFlow..."
 
 # Start backend in background
-backend/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+backend/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000 --loop asyncio &
 BACKEND_PID=$!
 echo "✓ Backend started (PID $BACKEND_PID)"
 
