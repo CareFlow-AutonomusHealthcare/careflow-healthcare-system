@@ -221,7 +221,7 @@ DELIMITER ;
 -- =========================================================================
 
 INSERT IGNORE INTO users (username, full_name, hashed_password, role, linked_id) VALUES
-('admin',       'System Administrator',  'admin123',  'admin',  NULL),
-('dr_smith',    'Dr. Sarah Smith',       'doctor123', 'doctor', 1),
-('dr_jones',    'Dr. Marcus Jones',      'doctor123', 'doctor', 2),
-('staff_coord', 'Coordinator Lisa Chen', 'staff123',  'staff',  1);
+('admin',       'System Administrator',  '$2b$12$a6/XMMgyPkZpDicznqFbWOzNT88uG2coxXCBu0oMZoQwHBNln2WSu',  'admin',  NULL),
+('dr_smith',    'Dr. Sarah Smith',       '$2b$12$FYkj0euIoZEBYjTytf3.t.W31maS4ThauEwzvOIPI05abmm.FYECS', 'doctor', 1),
+('dr_jones',    'Dr. Marcus Jones',      '$2b$12$f7rErpXPWzKU20.Hlbhti.C/1tGlAsA/XaX3OWIJFfz5vOHCHnVcm', 'doctor', 2),
+('staff_coord', 'Coordinator Lisa Chen', '$2b$12$yFhwGEa0WFs.4hifa1I2OOoLDHkkvb81key/yiS58M9DzwLog5CvK',  'staff',  1);

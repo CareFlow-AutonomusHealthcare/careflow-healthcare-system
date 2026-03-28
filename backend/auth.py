@@ -3,6 +3,7 @@ from typing import Optional
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from . import models
 from .database import get_db
@@ -13,14 +14,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def hash_password(password: str) -> str:
-    # No encryption — store plain text
-    return password
+    return pwd_context.hash(password)
 
 
 def verify_password(plain: str, stored: str) -> bool:
-    return plain == stored
+    return pwd_context.verify(plain, stored)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
