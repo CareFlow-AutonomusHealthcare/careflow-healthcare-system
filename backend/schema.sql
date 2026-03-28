@@ -1,8 +1,23 @@
 -- CareFlow Database Schema
--- Version: 1.0 (MVP)
+-- Version: 2.0 (Auth + Roles)
 
 CREATE DATABASE IF NOT EXISTS careflow_db;
 USE careflow_db;
+
+-- =========================================================================
+-- 0. USERS & AUTH
+-- =========================================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    full_name VARCHAR(255) NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    role ENUM('doctor', 'staff', 'admin') NOT NULL,
+    linked_id INT DEFAULT NULL,  -- FK to doctors.doctor_id or nursing_staff.staff_id
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- =========================================================================
 -- 1. INFRASTRUCTURE & RESOURCE TABLES
@@ -116,8 +131,9 @@ CREATE TABLE IF NOT EXISTS action_proposals (
 CREATE TABLE IF NOT EXISTS decisions (
     decision_id INT AUTO_INCREMENT PRIMARY KEY,
     proposal_id INT NOT NULL,
-    approver_id INT NOT NULL, -- References Doctor or Supervisor (we'll just use INT for now, could FK to doctors/nursing_staff)
+    approver_id INT NOT NULL,
     approver_type ENUM('Doctor', 'Nurse_Supervisor') NOT NULL,
+    comment TEXT DEFAULT NULL,
     decision_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (proposal_id) REFERENCES action_proposals(proposal_id) ON DELETE CASCADE
 );
@@ -194,3 +210,18 @@ BEGIN
 END;//
 
 DELIMITER ;
+
+-- =========================================================================
+-- 5. DEFAULT SEED USERS
+-- Credentials:
+--   admin    / admin123
+--   dr_smith / doctor123
+--   dr_jones / doctor123
+--   staff_coord / staff123
+-- =========================================================================
+
+INSERT IGNORE INTO users (username, full_name, hashed_password, role, linked_id) VALUES
+('admin',       'System Administrator',  'admin123',  'admin',  NULL),
+('dr_smith',    'Dr. Sarah Smith',       'doctor123', 'doctor', 1),
+('dr_jones',    'Dr. Marcus Jones',      'doctor123', 'doctor', 2),
+('staff_coord', 'Coordinator Lisa Chen', 'staff123',  'staff',  1);

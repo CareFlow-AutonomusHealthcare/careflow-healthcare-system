@@ -4,6 +4,12 @@ from sqlalchemy.sql import func
 from .database import Base
 import enum
 
+class UserRole(str, enum.Enum):
+    doctor = 'doctor'
+    staff = 'staff'
+    admin = 'admin'
+
+
 class RoomStatus(str, enum.Enum):
     Available = 'Available'
     Occupied = 'Occupied'
@@ -36,6 +42,19 @@ class LogActionType(str, enum.Enum):
     INSERT = 'INSERT'
     UPDATE = 'UPDATE'
     DELETE = 'DELETE'
+
+class User(Base):
+    __tablename__ = "users"
+    user_id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(100), unique=True, nullable=False, index=True)
+    full_name = Column(String(255), nullable=False)
+    hashed_password = Column(String(255), nullable=False)
+    role = Column(Enum(UserRole), nullable=False)
+    # For doctors: link to doctors table; for staff: link to nursing_staff
+    linked_id = Column(Integer, nullable=True)
+    is_active = Column(Integer, default=1)
+    created_at = Column(DateTime, default=func.now())
+
 
 class Department(Base):
     __tablename__ = "departments"
@@ -153,6 +172,7 @@ class Decision(Base):
     proposal_id = Column(Integer, ForeignKey("action_proposals.proposal_id", ondelete="CASCADE"), nullable=False)
     approver_id = Column(Integer, nullable=False)
     approver_type = Column(Enum(ApproverType), nullable=False)
+    comment = Column(Text, nullable=True)
     decision_timestamp = Column(DateTime, default=func.now())
 
 class AuditLog(Base):

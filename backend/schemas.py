@@ -1,7 +1,38 @@
 from pydantic import BaseModel, root_validator
 from typing import Optional, List, Any, Dict
 from datetime import datetime
-from .models import RoomStatus, ShiftType, AppointmentStatus, ActionType, ProposalStatus, ApproverType
+from .models import RoomStatus, ShiftType, AppointmentStatus, ActionType, ProposalStatus, ApproverType, UserRole
+
+# --- Auth & Users ---
+class UserCreate(BaseModel):
+    username: str
+    full_name: str
+    password: str
+    role: UserRole
+    linked_id: Optional[int] = None
+
+class UserOut(BaseModel):
+    user_id: int
+    username: str
+    full_name: str
+    role: UserRole
+    linked_id: Optional[int]
+    is_active: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserOut
+
+class DecisionWithComment(BaseModel):
+    action: ProposalStatus
+    approver_id: int
+    approver_type: ApproverType
+    comment: Optional[str] = None
+
 
 # --- Core Infrastructure Defaults ---
 class DepartmentBase(BaseModel):
@@ -89,6 +120,7 @@ class DecisionBase(BaseModel):
     approver_id: int
     approver_type: ApproverType
     action: ProposalStatus # Approve or Reject
+    comment: Optional[str] = None
 
 class DecisionCreate(DecisionBase):
     proposal_id: int
@@ -97,6 +129,25 @@ class Decision(DecisionBase):
     decision_id: int
     proposal_id: int
     decision_timestamp: datetime
-    # We map 'action' back to update the proposal in the endpoint
+    class Config:
+        from_attributes = True
+
+# --- Inventory & Staffing ---
+class Inventory(BaseModel):
+    item_id: int
+    department_id: Optional[int]
+    item_name: str
+    quantity_in_stock: int
+    unit: Optional[str]
+    class Config:
+        from_attributes = True
+
+class StaffingCapacity(BaseModel):
+    capacity_id: int
+    department_id: Optional[int]
+    shift: ShiftType
+    current_staff_count: int
+    required_staff_count: int
+    recorded_at: datetime
     class Config:
         from_attributes = True
