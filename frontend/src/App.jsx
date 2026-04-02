@@ -2,79 +2,77 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Layouts
 import DoctorLayout from './components/DoctorLayout';
 import StaffLayout from './components/StaffLayout';
 import AdminLayout from './components/AdminLayout';
 
-// Auth
 import LoginPage from './pages/LoginPage';
 
-// Doctor pages
+import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import PatientHistory from './pages/doctor/PatientHistory';
 import DoctorProposals from './pages/doctor/DoctorProposals';
 
-// Staff pages
+import StaffDashboard from './pages/staff/StaffDashboard';
 import PresentPatients from './pages/staff/PresentPatients';
 import StaffPresence from './pages/staff/StaffPresence';
 import ApprovedDecisions from './pages/staff/ApprovedDecisions';
 
-// Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProposals from './pages/admin/AdminProposals';
 import UserManagement from './pages/admin/UserManagement';
 import InventoryManager from './pages/admin/InventoryManager';
 import AuditLogs from './pages/admin/AuditLogs';
-import AdminProposals from './pages/admin/AdminProposals';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-clinical-900 flex items-center justify-center">
-        <div className="text-gray-400 animate-pulse">Loading CareFlow...</div>
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
+            style={{ background: 'linear-gradient(135deg, #00478d 0%, #005eb8 100%)' }}>
+            <span className="material-symbols-outlined animate-spin">progress_activity</span>
+          </div>
+          <p className="text-on-surface-variant text-sm font-medium">Loading CareFlow...</p>
+        </div>
       </div>
     );
   }
 
   if (!user) {
-    return (
-      <Routes>
-        <Route path="*" element={<LoginPage />} />
-      </Routes>
-    );
+    return <Routes><Route path="*" element={<LoginPage />} /></Routes>;
   }
 
-  // Doctor routes
   if (user.role === 'doctor') {
     return (
       <DoctorLayout>
         <Routes>
-          <Route path="/" element={<Navigate to="/doctor/patients" replace />} />
+          <Route path="/" element={<Navigate to="/doctor/dashboard" replace />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
           <Route path="/doctor/patients" element={<PatientHistory />} />
           <Route path="/doctor/proposals" element={<DoctorProposals />} />
-          <Route path="*" element={<Navigate to="/doctor/patients" replace />} />
+          <Route path="*" element={<Navigate to="/doctor/dashboard" replace />} />
         </Routes>
       </DoctorLayout>
     );
   }
 
-  // Staff routes
   if (user.role === 'staff') {
     return (
       <StaffLayout>
         <Routes>
-          <Route path="/" element={<Navigate to="/staff/patients" replace />} />
+          <Route path="/" element={<Navigate to="/staff/dashboard" replace />} />
+          <Route path="/staff/dashboard" element={<StaffDashboard />} />
           <Route path="/staff/patients" element={<PresentPatients />} />
           <Route path="/staff/presence" element={<StaffPresence />} />
           <Route path="/staff/decisions" element={<ApprovedDecisions />} />
-          <Route path="*" element={<Navigate to="/staff/patients" replace />} />
+          <Route path="*" element={<Navigate to="/staff/dashboard" replace />} />
         </Routes>
       </StaffLayout>
     );
   }
 
-  // Admin routes
   if (user.role === 'admin') {
     return (
       <AdminLayout>

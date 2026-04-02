@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CareFlow | Staff Coordinator Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-surface": "#2d3133",
+              "surface-variant": "#e0e3e5",
+              "surface-bright": "#f7f9fb",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a",
+              "tertiary-container": "#9f4300",
+              "on-secondary": "#ffffff",
+              "surface-container-highest": "#e0e3e5",
+              "on-tertiary-container": "#ffcfb9",
+              "inverse-primary": "#a9c7ff",
+              "surface-container-low": "#f2f4f6",
+              "on-secondary-fixed": "#021d31",
+              "on-surface-variant": "#424752",
+              "background": "#f7f9fb",
+              "secondary": "#4a6178",
+              "secondary-fixed": "#cee5ff",
+              "surface": "#f7f9fb",
+              "outline": "#727783",
+              "surface-container": "#eceef0",
+              "on-primary-container": "#c8daff",
+              "on-background": "#191c1e",
+              "secondary-fixed-dim": "#b1c9e4",
+              "outline-variant": "#c2c6d4",
+              "tertiary-fixed-dim": "#ffb691",
+              "on-error-container": "#93000a",
+              "on-primary-fixed-variant": "#00468c",
+              "on-primary-fixed": "#001b3d",
+              "on-tertiary-fixed-variant": "#793100",
+              "surface-dim": "#d8dadc",
+              "tertiary": "#793100",
+              "surface-tint": "#005db6",
+              "tertiary-fixed": "#ffdbcb",
+              "on-secondary-container": "#4e657c",
+              "surface-container-high": "#e6e8ea",
+              "on-surface": "#191c1e",
+              "secondary-container": "#cae2fe",
+              "on-error": "#ffffff",
+              "primary": "#00478d",
+              "error-container": "#ffdad6",
+              "surface-container-lowest": "#ffffff",
+              "primary-container": "#005eb8",
+              "on-tertiary-fixed": "#341100",
+              "on-tertiary": "#ffffff",
+              "primary-fixed": "#d6e3ff",
+              "on-secondary-fixed-variant": "#32495f",
+              "primary-fixed-dim": "#a9c7ff",
+              "inverse-on-surface": "#eff1f3"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body { font-family: 'Inter', sans-serif; }
+      h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+      }
+      .primary-gradient {
+        background: linear-gradient(135deg, #00478d 0%, #005eb8 100%);
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Sidebar Navigation Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto z-40 bg-slate-100 dark:bg-slate-950 flex flex-col py-6 space-y-2 border-r border-slate-200/10 font-['Inter'] font-medium text-sm">
+<div class="px-6 mb-8">
+<h1 class="font-['Manrope'] font-extrabold text-blue-800 dark:text-blue-200 text-2xl tracking-tighter">CareFlow</h1>
+<p class="text-xs text-on-surface-variant font-medium tracking-wide">Clinical Ledger</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 shadow-sm rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+            </a>
+<a class="text-slate-600 dark:text-slate-400 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/30 rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span> Patients
+            </a>
+<a class="text-slate-600 dark:text-slate-400 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/30 rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span> Proposals
+            </a>
+<a class="text-slate-600 dark:text-slate-400 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/30 rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span> Inventory
+            </a>
+<a class="text-slate-600 dark:text-slate-400 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/30 rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span> Coordination
+            </a>
+<a class="text-slate-600 dark:text-slate-400 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/30 rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span> Analytics
+            </a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full primary-gradient text-on-primary py-3 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span> New Coordination
+            </button>
+</div>
+<div class="pt-6 border-t border-slate-200/10 space-y-1">
+<a class="text-slate-600 dark:text-slate-400 px-4 py-2 mx-2 flex items-center gap-3 hover:text-blue-600 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span> Help Center
+            </a>
+<a class="text-slate-600 dark:text-slate-400 px-4 py-2 mx-2 flex items-center gap-3 hover:text-blue-600 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Sign Out
+            </a>
+</div>
+</aside>
+<!-- Top AppBar Shell -->
+<header class="fixed top-0 right-0 left-64 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl z-30 shadow-sm flex justify-between items-center px-6 py-3 border-b border-slate-200/10 font-['Manrope'] antialiased tracking-tight">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search patients, doctors, or wards..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase tracking-widest">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                On-Duty Status
+            </div>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors duration-200 hover:bg-slate-100/50 rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors duration-200 hover:bg-slate-100/50 rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200">
+<img alt="User profile avatar" data-alt="close-up portrait of professional female doctor in white coat with focused and warm expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkkhoyJMH0IV3mdWG7l2Ba4w7jPXpEKAtVW12EaHOnl7JEYmDMb9wYZp10OS7Z4Rwj4iJrieosWTSX6dILJIhBwzdltHXpM2MJWyxnJBKPfRoeQdl0wJfXVkux9F6E5ydyXJ1-mW7X1f0g69MCnqeSt6cXYNu7dsgtjuVr-cnm-faMUsUn0VLz10HVFgZiU2eLVeF7mMWpwQVsfkMd5grAtYYA-WL6hs9mvgOruJQKEmvJDlf5RocYnMxjxTQ1EUInAJi3RWH_eNA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-20 p-8 min-h-screen">
+<!-- Hospital Capacity Metrics (Bento Style) -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="col-span-1 bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-primary">
+<p class="text-label-md text-on-surface-variant font-medium mb-1">Bed Occupancy</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-primary">84%</h3>
+<span class="text-error text-xs font-bold flex items-center bg-error-container px-2 py-0.5 rounded-full mb-1">
+<span class="material-symbols-outlined text-sm mr-0.5" data-icon="trending_up">trending_up</span> 12%
+                    </span>
+</div>
+<div class="mt-4 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[84%]"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-2">214 of 255 beds occupied</p>
+</div>
+<div class="col-span-1 bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-tertiary">
+<p class="text-label-md text-on-surface-variant font-medium mb-1">Nurse-to-Patient</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-tertiary">1:4.2</h3>
+<span class="text-tertiary text-xs font-bold flex items-center bg-tertiary-fixed px-2 py-0.5 rounded-full mb-1">
+                        Optimal
+                    </span>
+</div>
+<div class="mt-4 flex gap-1">
+<div class="flex-1 h-1.5 bg-tertiary rounded-full"></div>
+<div class="flex-1 h-1.5 bg-tertiary rounded-full"></div>
+<div class="flex-1 h-1.5 bg-tertiary rounded-full"></div>
+<div class="flex-1 h-1.5 bg-surface-container rounded-full"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-2">Target: 1:4.0 (A-Grade Safety)</p>
+</div>
+<div class="col-span-1 bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-green-600">
+<p class="text-label-md text-on-surface-variant font-medium mb-1">Active Responders</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-green-700">32</h3>
+<p class="text-xs text-on-surface-variant font-medium mb-1">Staff On-Duty</p>
+</div>
+<div class="mt-4 flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white" data-alt="portrait of male physician in clinical setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL4NHqKkUKmcZ-gJlwbnSlBGXPZhTCw_tNR8oNgXh7StfCvkPLczT0AoeL1kxoSvpv2uGbwA4K8g3Pk--4O2NRR1-9TXWBDBx-Kj0U9-fiIlpfOpNzYjsR4BUYrBZxyPgVq3xTZPAibQN62qsu0775Bk3PVk3RnTcLbvz7Eu2BpA1LaX_nMY3AoOaGIYBaX_jcOxPBDdcsmU_TfbjGSDr-lKLl12N471-6Y8x9pdc8Ab_TdtJ6xmpxoWgEbnIen-o4Rdn2EjEY6WI"/>
+<img class="w-8 h-8 rounded-full border-2 border-white" data-alt="portrait of smiling female nurse with stethoscope" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDccX3DgUA7q0-du7ZNT7FusTrE5OBQJyndh6bzqgmK_991oLAxVvdmADcwKEArmA9MhHJu9yqauUeMjex7akXrcE9SZ384_EwpK9yVjwARPxYlsbiX5g_4b3Rvpck97gGiM1II2WhoTOOqgqV9XuVtvJXeHrnv06pYDJIe_mHaH2uEE9FsK2-SQFAgV9hFb5TmlaYM55AwkdgnX0GBL0GtSIWcDhrJwTbuDS27JbUUigKcZE_379_wJnoh-Kw9fzseXVO3m2tBmP0"/>
+<img class="w-8 h-8 rounded-full border-2 border-white" data-alt="professional male doctor portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLwVsAngjy4NpYWuiDYzXRMzk-AnIiurbd6k5wtccjpLz4XztH6v62pFAhEoS9E0gv2slMx1DxCMdKkl3_7oxvdzdA-zvDVnxT5LfOl8PJ4GhzfXsGtTAuj3EyKHFFWiQrYm7Jju1BzsFfMnSDJ9mhep-TWBp4PLUQDtfgQbNesY32DzVIdoSKrnDqCtKBl1m-qLmR26H57MIpSJih0HbqBiWTlXsWMoIQlQHcFP_gfPVTr5La5hckLrgrIJj3DuIziMEvVrBwFEk"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">+29</div>
+</div>
+</div>
+<div class="col-span-1 bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-blue-400">
+<p class="text-label-md text-on-surface-variant font-medium mb-1">ER Wait Time</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-blue-900">18m</h3>
+<span class="text-primary text-xs font-bold flex items-center bg-primary-fixed px-2 py-0.5 rounded-full mb-1">
+<span class="material-symbols-outlined text-sm mr-0.5" data-icon="trending_down">trending_down</span> 4m
+                    </span>
+</div>
+<div class="mt-4 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-blue-400 w-[45%]"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-2">Benchmark: &lt;25m</p>
+</div>
+</section>
+<!-- Main Dashboard Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Inpatient Table & Staff Grid -->
+<div class="col-span-8 space-y-10">
+<!-- Current Inpatient List -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<div class="px-6 py-4 flex items-center justify-between bg-primary-fixed border-b border-primary/10">
+<h2 class="text-lg font-bold text-on-primary-fixed">Current Inpatient Census</h2>
+<button class="text-xs font-bold uppercase tracking-wider text-primary hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant uppercase text-[10px] font-extrabold tracking-widest">
+<th class="px-6 py-4">Patient Name</th>
+<th class="px-6 py-4">Ward / Room</th>
+<th class="px-6 py-4">Assigned Doctor</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">EJ</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Elena Jacobs</p>
+<p class="text-[10px] text-on-surface-variant">ID: #4492-A</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Cardiology • 402-A</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" data-alt="male doctor headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs4Wh55PxJL8CoIg88SyZjve2JjuZ_wp2l_e8oALaqYglr6sHuaRPGANGYtuDfnlK5Dv_wBathOfaM3-j6xlfYBzUL74nspCNwnlVYhSVZYxm9zhIeKOrar2j5gaWKeU9gLYuPjCcyYqYmpT3xnWH7Vz6k1YuQemCkW8DJ0oXcRrt3kJIqz4QbA6LL64OVCWenzR_e4tAlbLECJxU929aZs7VrnpCDF3hNeWS22MujU2NgkWXnBMpmEOkzo5G7xJsaZUFYdPepIac"/>
+<p class="text-sm text-on-surface">Dr. Aris Thorne</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700">STABLE</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 rounded-md hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg text-slate-400" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-red-50 text-red-700 flex items-center justify-center font-bold text-xs">RM</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Robert Miller</p>
+<p class="text-[10px] text-on-surface-variant">ID: #8821-C</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">ICU • 108</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" data-alt="professional female doctor portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHgN4KdODHb1dkMS_eLUAPWlKQ_8pMt0uXTbebIijjvMkhvnWwvSHAuvH7St0l_Wu-z5yk18cRfoI42O_gzIr8HnuBO-4b_MDibxEtOoas6BzqcIgjtf2Qse2B9sDnsAo6XvGsG4MSZUjJ6HBIZ_m-VvyLZPqGcXvLpLzsocVkKGgLcrLuLc0qEwcV4IABBmgJZ3o6GJta59XpMQjgQjcXahy4hN_yS7ZXlkWLbkcQl2H2bI_0IcYjMoJOrCbnDaIS2k3m0FLx5hU"/>
+<p class="text-sm text-on-surface">Dr. Sarah Chen</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-error-container text-error">CRITICAL</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 rounded-md hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg text-slate-400" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">LM</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Linda Meyers</p>
+<p class="text-[10px] text-on-surface-variant">ID: #3112-B</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Neurology • 215</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" data-alt="doctor in hospital profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy8emzJGYIkyQB3fIWjAFQgUb6vwYaH5OYxmjF_xFX2ZT05BGsj1JEQlJBW6mb5bovKOl0f1lInc5k1QWemW6ky4w_uoDOo4yewlUkopdCxi8o82qCuZs5lY1ZZ7cq5Aw3Nnrs04KGaeA0EUuHaiG6M9XP3hYyrwG7Hm1laSEo7uvs6gVfoV9zpZGnIY6oMyXVAd8PTTctXnMpBecsJgMxCzInHG5a8OSPVqq0ZzyoPD9N1RtA5Bi7vFCB1IfmVzLGk-qiZdlyH84"/>
+<p class="text-sm text-on-surface">Dr. Marcus Vos</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-tertiary-fixed text-tertiary">MONITORING</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 rounded-md hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg text-slate-400" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Staff Presence Panel -->
+<div class="bg-surface-container-low p-8 rounded-2xl">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h2 class="text-2xl font-bold text-on-surface tracking-tight">Staff Presence</h2>
+<p class="text-sm text-on-surface-variant">Real-time shift tracking and availability</p>
+</div>
+<div class="flex gap-2">
+<select class="bg-surface-container-lowest border-none text-xs font-bold py-2 px-4 rounded-lg shadow-sm focus:ring-primary">
+<option>All Departments</option>
+<option>Cardiology</option>
+<option>Emergency</option>
+<option>Neurology</option>
+</select>
+<button class="bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-lg" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Staff Card 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm hover:translate-y-[-2px] transition-transform cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+</div>
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-lg object-cover" data-alt="professional nurse smiling portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk3Og-i52p1ZepaKiGH5VwAjy62derQRkZT8vujLOAtL5bVzor6sbO298W2odmskZrixCuUgWuX2M3blg0tA9rDPaT-ME0dRJp3tIkltRZkY20rzL55ECGLBS4bWqIuxGALoyYnaE8hik3oATkL9i0BpyKUTL20KvpPiHGMixEbl4aCGjv0uvVIGIH8_vsNILexrGvogknN1ScKZuJYNd7eQT2cFIsSQK-v3I4U6A_0f2BBGFMTWGuidtE-im8AZ64tFdG2fMd5Jc"/>
+<div>
+<p class="font-bold text-sm text-on-surface">Nurse Sarah Jenkins</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">ICU Team Lead</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-md font-bold">ON-DUTY</span>
+<span class="text-[10px] text-on-surface-variant">Room: 104-110</span>
+</div>
+</div>
+<!-- Staff Card 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm hover:translate-y-[-2px] transition-transform cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+</div>
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-lg object-cover" data-alt="male doctor headshot profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO7eu5MH5i_kdN7ofVslpWSBAX0hDJJTXErLJLFCeymum5KV4_qK3Huvggf34fW7VXRZUMuV51EGP5daTJi2c-EsLeC-BTu8BuZEOOSoFXXPK6vXwwUb7CoipWLsB3XY2AUuJ5qKono5ttYLILQAiRneG8yqZzwrY1RBJvHSAy2M3nhErREeEt_GUYEWAzvWrTJq4DmBOUUx0jKxkBhfioiOdI_J5dd0s-mWEuuGsaHi_QAqoP_aNo2-FY5ke5GH0KqcRD-cuBUsI"/>
+<div>
+<p class="font-bold text-sm text-on-surface">Dr. Aris Thorne</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Cardiology</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-md font-bold">ON-DUTY</span>
+<span class="text-[10px] text-on-surface-variant">Surgery B</span>
+</div>
+</div>
+<!-- Staff Card 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm opacity-60 hover:opacity-100 transition-opacity cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<div class="w-2 h-2 rounded-full bg-slate-400"></div>
+</div>
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-lg object-cover grayscale" data-alt="physician headshot professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM7Z0oGah5o-ERr8PnYAMcf3X4N3RS8RaeZbBq1umGMMM-DxEJLwg5iFx8dj72uRmLEojb287LFxkFs2wM2d2yIYRVC_2JChd-eu5TRrfoyB-ze1JBwX0qoQNmyyOGmqWKVJt6n9U3wKYmnAufkvvbvbWrCYzPVBeAqYwIba8b7KD3mTwb7ufLfeyQscguXG9W4aAf9wahlldR5ep9ftkeFX91dL8aONlKMwF57oumP-r9U13LgEaNSa7ogTJi2JdbDt0FG9OJFOs"/>
+<div>
+<p class="font-bold text-sm text-on-surface">Dr. Marcus Vos</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Neurology</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-bold">OFF-DUTY</span>
+<span class="text-[10px] text-on-surface-variant">Shift Starts: 20:00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Recent Activity Feed -->
+<div class="col-span-4">
+<div class="sticky top-20 bg-surface-container-low rounded-2xl p-6 h-[calc(100vh-120px)] overflow-y-auto">
+<h2 class="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="history">history</span>
+                        Clinical Decisions
+                    </h2>
+<div class="space-y-6 relative before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container">
+<!-- Activity Item 1 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center border-4 border-surface-container-low z-10">
+<span class="material-symbols-outlined text-[12px] text-green-700 font-bold" data-icon="check">check</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-1">
+<p class="text-xs font-bold text-on-surface">Surgery Approval</p>
+<span class="text-[10px] text-on-surface-variant font-medium">2m ago</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mb-2">Dr. Sarah Chen approved Laparoscopic appendectomy for <strong>Elena Jacobs</strong>.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-green-50 text-green-600 text-[9px] font-bold rounded">LEVEL 2 PRIORITY</span>
+</div>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-error-container flex items-center justify-center border-4 border-surface-container-low z-10">
+<span class="material-symbols-outlined text-[12px] text-error font-bold" data-icon="close">close</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-1">
+<p class="text-xs font-bold text-on-surface">Medication Rejection</p>
+<span class="text-[10px] text-on-surface-variant font-medium">14m ago</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mb-2">Dr. Aris Thorne rejected dosage increase of Warfarin for <strong>Robert Miller</strong> due to INR levels.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-error-container text-error text-[9px] font-bold rounded">VITAL WARNING</span>
+</div>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center border-4 border-surface-container-low z-10">
+<span class="material-symbols-outlined text-[12px] text-blue-700 font-bold" data-icon="sync">sync</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-1">
+<p class="text-xs font-bold text-on-surface">Ward Transfer</p>
+<span class="text-[10px] text-on-surface-variant font-medium">32m ago</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mb-2">Patient <strong>Linda Meyers</strong> transferred from ER to Neurology Ward Room 215.</p>
+<p class="text-[9px] text-primary font-bold uppercase tracking-tight">Coordination: Charge Nurse Sarah</p>
+</div>
+</div>
+<!-- Activity Item 4 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center border-4 border-surface-container-low z-10">
+<span class="material-symbols-outlined text-[12px] text-green-700 font-bold" data-icon="check">check</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-1">
+<p class="text-xs font-bold text-on-surface">Discharge Authorized</p>
+<span class="text-[10px] text-on-surface-variant font-medium">1h ago</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mb-2">Dr. Marcus Vos authorized discharge for <strong>Kevin Vance</strong>. Post-op recovery complete.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

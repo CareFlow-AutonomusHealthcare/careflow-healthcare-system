@@ -1,100 +1,126 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollText, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { careflowAPI } from '../../api/client';
 
-const ACTION_COLORS = {
-  INSERT: 'text-clinical-success bg-clinical-success/10 border-clinical-success/30',
-  UPDATE: 'text-clinical-warning bg-clinical-warning/10 border-clinical-warning/30',
-  DELETE: 'text-clinical-danger bg-clinical-danger/10 border-clinical-danger/30',
+const ACTION_STYLES = {
+  INSERT: 'chip-success',
+  UPDATE: 'chip-warning',
+  DELETE: 'chip-high',
 };
 
 export default function AuditLogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
+  const [filter, setFilter] = useState('All');
 
   const load = () => {
     setLoading(true);
-    careflowAPI.getAuditLogs(200)
-      .then(r => setLogs(r.data))
-      .catch(() => setLogs([]))
-      .finally(() => setLoading(false));
+    careflowAPI.getAuditLogs(200).then(r => setLogs(r.data)).catch(() => {}).finally(() => setLoading(false));
   };
-
   useEffect(() => { load(); }, []);
 
+  const filtered = filter === 'All' ? logs : logs.filter(l => l.action_type === filter);
+
   return (
-    <div className="animate-fade-in space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-3">
-            <ScrollText className="text-purple-400" size={26} /> Audit Logs
-          </h2>
-          <p className="text-gray-400 mt-1">Immutable record of all system changes.</p>
+          <h2 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">Audit & Compliance Log</h2>
+          <p className="text-on-surface-variant mt-1">Immutable ledger of clinical proposals and system-wide state changes.</p>
         </div>
-        <button onClick={load} disabled={loading} className="clinical-btn-outline text-sm">
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh
+        <button onClick={load} disabled={loading} className="clinical-btn-secondary px-4 py-2.5">
+          <span className={`material-symbols-outlined text-lg ${loading ? 'animate-spin' : ''}`}>refresh</span>
+          Refresh
         </button>
       </div>
 
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading logs...</div>
-      ) : logs.length === 0 ? (
-        <div className="glass-panel p-12 text-center text-gray-500">
-          <ScrollText size={40} className="mx-auto mb-4 opacity-30" />
-          <p>No audit logs yet.</p>
-        </div>
-      ) : (
-        <div className="glass-panel overflow-hidden">
-          <div className="grid grid-cols-5 px-6 py-3 border-b border-clinical-border text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            <div>Table</div>
-            <div>Entity ID</div>
-            <div>Action</div>
-            <div>Timestamp</div>
-            <div className="text-right">Payload</div>
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        {[
+          { label: 'Total Logs', value: logs.length, color: 'text-on-surface' },
+          { label: 'Inserts', value: logs.filter(l=>l.action_type==='INSERT').length, color: 'text-green-700' },
+          { label: 'Updates', value: logs.filter(l=>l.action_type==='UPDATE').length, color: 'text-tertiary' },
+          { label: 'Deletes', value: logs.filter(l=>l.action_type==='DELETE').length, color: 'text-error' },
+        ].map(s => (
+          <div key={s.label} className="stat-card text-center">
+            <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">{s.label}</p>
+            <p className={`font-headline text-3xl font-extrabold ${s.color}`}>{s.value}</p>
           </div>
-          {logs.map(log => (
-            <React.Fragment key={log.audit_id}>
-              <div
-                className="grid grid-cols-5 px-6 py-3 border-b border-clinical-border/50 hover:bg-clinical-700/20 transition-colors items-center cursor-pointer"
-                onClick={() => setExpanded(expanded === log.audit_id ? null : log.audit_id)}
-              >
-                <div className="font-mono text-sm text-gray-300">{log.table_name}</div>
-                <div className="font-mono text-sm text-gray-400">#{log.entity_id}</div>
-                <div>
-                  <span className={`text-xs px-2 py-0.5 rounded border font-semibold ${ACTION_COLORS[log.action_type] || ''}`}>
-                    {log.action_type}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500">{new Date(log.created_at).toLocaleString()}</div>
-                <div className="flex justify-end">
-                  {expanded === log.audit_id ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
-                </div>
-              </div>
-              {expanded === log.audit_id && (
-                <div className="px-6 py-4 bg-clinical-900/50 border-b border-clinical-border/50">
-                  <div className="grid md:grid-cols-2 gap-4 text-xs font-mono">
-                    {log.old_payload && (
+        ))}
+      </div>
+
+      {/* Filter */}
+      <div className="bg-surface-container p-1 rounded-lg flex gap-1 w-fit">
+        {['All','INSERT','UPDATE','DELETE'].map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`px-5 py-2 rounded-md text-xs font-bold transition-all ${filter===f ? 'bg-surface-container-lowest shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16"><span className="material-symbols-outlined text-4xl animate-spin">progress_activity</span></div>
+      ) : (
+        <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 bg-primary-fixed border-b border-primary/10 flex items-center justify-between">
+            <h3 className="font-headline font-bold text-on-primary-fixed">Technical Audit Log</h3>
+            <span className="text-xs text-on-primary-fixed-variant font-bold">{filtered.length} entries</span>
+          </div>
+          {filtered.length === 0 ? (
+            <div className="py-16 text-center text-on-surface-variant">
+              <span className="material-symbols-outlined text-4xl mb-3 block opacity-20">history_edu</span>
+              <p>No audit logs yet.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-outline-variant/10">
+              {filtered.map(log => (
+                <React.Fragment key={log.audit_id}>
+                  <div
+                    className="flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer"
+                    onClick={() => setExpanded(expanded === log.audit_id ? null : log.audit_id)}
+                  >
+                    <div className={`w-1.5 h-10 rounded-full flex-shrink-0 ${log.action_type==='INSERT'?'bg-green-500':log.action_type==='UPDATE'?'bg-tertiary':'bg-error'}`}></div>
+                    <div className="flex-1 grid grid-cols-4 gap-4 items-center">
                       <div>
-                        <p className="text-gray-500 mb-1">Old Payload</p>
-                        <pre className="bg-clinical-800 rounded p-3 text-gray-300 overflow-auto">
-                          {JSON.stringify(log.old_payload, null, 2)}
-                        </pre>
+                        <p className="font-mono text-sm font-semibold text-on-surface">{log.table_name}</p>
+                        <p className="text-xs text-on-surface-variant">Entity #{log.entity_id}</p>
                       </div>
-                    )}
-                    {log.new_payload && (
-                      <div>
-                        <p className="text-gray-500 mb-1">New Payload</p>
-                        <pre className="bg-clinical-800 rounded p-3 text-gray-300 overflow-auto">
-                          {JSON.stringify(log.new_payload, null, 2)}
-                        </pre>
+                      <div><span className={ACTION_STYLES[log.action_type] || 'chip-low'}>{log.action_type}</span></div>
+                      <div className="text-xs text-on-surface-variant">{new Date(log.created_at).toLocaleString()}</div>
+                      <div className="text-right">
+                        <span className="material-symbols-outlined text-on-surface-variant text-lg">
+                          {expanded === log.audit_id ? 'expand_less' : 'expand_more'}
+                        </span>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </React.Fragment>
-          ))}
+                  {expanded === log.audit_id && (
+                    <div className="px-6 py-4 bg-surface-container-low border-b border-outline-variant/10">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {log.old_payload && (
+                          <div>
+                            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Old Payload</p>
+                            <pre className="bg-inverse-surface text-inverse-on-surface rounded-xl p-4 text-xs font-mono overflow-auto max-h-48">
+                              {JSON.stringify(log.old_payload, null, 2)}
+                            </pre>
+                          </div>
+                        )}
+                        {log.new_payload && (
+                          <div>
+                            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">New Payload</p>
+                            <pre className="bg-inverse-surface text-inverse-on-surface rounded-xl p-4 text-xs font-mono overflow-auto max-h-48">
+                              {JSON.stringify(log.new_payload, null, 2)}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

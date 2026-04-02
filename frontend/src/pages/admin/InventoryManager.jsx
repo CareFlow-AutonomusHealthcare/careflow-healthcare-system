@@ -1,30 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Edit2, Check, X } from 'lucide-react';
 import { careflowAPI } from '../../api/client';
-
-const MOCK_INVENTORY = [
-  { item_id: 1, item_name: 'Surgical Gloves', quantity_in_stock: 240, unit: 'pairs', department_id: 1 },
-  { item_id: 2, item_name: 'IV Bags (500ml)', quantity_in_stock: 45, unit: 'units', department_id: 1 },
-  { item_id: 3, item_name: 'Syringes (10ml)', quantity_in_stock: 8, unit: 'boxes', department_id: 2 },
-  { item_id: 4, item_name: 'Blood Pressure Cuffs', quantity_in_stock: 12, unit: 'units', department_id: 2 },
-];
 
 export default function InventoryManager() {
   const [items, setItems] = useState([]);
-  const [editing, setEditing] = useState(null); // item_id
+  const [editing, setEditing] = useState(null);
   const [editQty, setEditQty] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    careflowAPI.getInventory()
-      .then(r => setItems(r.data))
-      .catch(() => setItems(MOCK_INVENTORY));
+    careflowAPI.getInventory().then(r => setItems(r.data)).catch(() => {});
   }, []);
-
-  const startEdit = (item) => {
-    setEditing(item.item_id);
-    setEditQty(String(item.quantity_in_stock));
-  };
 
   const saveEdit = async (itemId) => {
     setSaving(true);
@@ -35,73 +20,81 @@ export default function InventoryManager() {
     finally { setSaving(false); setEditing(null); }
   };
 
-  const stockLevel = (qty) => {
-    if (qty <= 10) return { label: 'Critical', cls: 'text-clinical-danger bg-clinical-danger/10 border-clinical-danger/30' };
-    if (qty <= 50) return { label: 'Low', cls: 'text-clinical-warning bg-clinical-warning/10 border-clinical-warning/30' };
-    return { label: 'OK', cls: 'text-clinical-success bg-clinical-success/10 border-clinical-success/30' };
+  const level = (qty) => {
+    if (qty <= 10) return { label: 'Critical', cls: 'chip-high', bar: 'bg-error', pct: Math.max((qty/200)*100, 3) };
+    if (qty <= 50) return { label: 'Low', cls: 'chip-warning', bar: 'bg-tertiary', pct: (qty/200)*100 };
+    return { label: 'OK', cls: 'chip-success', bar: 'bg-green-500', pct: Math.min((qty/200)*100, 100) };
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold flex items-center gap-3">
-          <Package className="text-purple-400" size={26} /> Inventory Management
-        </h2>
-        <p className="text-gray-400 mt-1">View and update equipment stock levels.</p>
+        <h2 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">Inventory Management</h2>
+        <p className="text-on-surface-variant mt-1">Monitor and update equipment stock levels across departments.</p>
       </div>
 
-      <div className="glass-panel overflow-hidden">
-        <div className="grid grid-cols-5 px-6 py-3 border-b border-clinical-border text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          <div className="col-span-2">Item</div>
-          <div>Quantity</div>
-          <div>Status</div>
-          <div className="text-right">Order</div>
+      {/* Summary */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: 'Total Items', value: items.length, color: 'text-primary' },
+          { label: 'Low Stock', value: items.filter(i=>i.quantity_in_stock<=50&&i.quantity_in_stock>10).length, color: 'text-tertiary' },
+          { label: 'Critical', value: items.filter(i=>i.quantity_in_stock<=10).length, color: 'text-error' },
+        ].map(s => (
+          <div key={s.label} className="stat-card text-center">
+            <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">{s.label}</p>
+            <p className={`font-headline text-3xl font-extrabold ${s.color}`}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 bg-primary-fixed border-b border-primary/10">
+          <h3 className="font-headline font-bold text-on-primary-fixed">Stock Levels</h3>
         </div>
-        {items.map(item => {
-          const level = stockLevel(item.quantity_in_stock);
-          return (
-            <div key={item.item_id} className="grid grid-cols-5 px-6 py-4 border-b border-clinical-border/50 last:border-0 hover:bg-clinical-700/20 transition-colors items-center">
-              <div className="col-span-2">
-                <p className="font-medium text-gray-200">{item.item_name}</p>
-                <p className="text-xs text-gray-500">{item.unit}</p>
-              </div>
-              <div>
-                {editing === item.item_id ? (
-                  <input
-                    type="number"
-                    value={editQty}
-                    onChange={e => setEditQty(e.target.value)}
-                    className="w-24 bg-clinical-900 border border-clinical-accent rounded px-2 py-1 text-gray-100 text-sm focus:outline-none"
-                    autoFocus
-                  />
-                ) : (
-                  <span className="font-mono text-gray-200">{item.quantity_in_stock}</span>
-                )}
-              </div>
-              <div>
-                <span className={`text-xs px-2 py-1 rounded border font-semibold ${level.cls}`}>
-                  {level.label}
-                </span>
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                {editing === item.item_id ? (
-                  <>
-                    <button onClick={() => saveEdit(item.item_id)} disabled={saving} className="p-2 text-clinical-success hover:bg-clinical-700 rounded-lg transition-colors">
-                      <Check size={15} />
+        <table className="data-table">
+          <thead>
+            <tr><th>Item</th><th>Unit</th><th>Quantity</th><th>Level</th><th>Stock Bar</th><th className="text-right">Order</th></tr>
+          </thead>
+          <tbody>
+            {items.map(item => {
+              const l = level(item.quantity_in_stock);
+              return (
+                <tr key={item.item_id}>
+                  <td className="font-medium text-sm text-on-surface">{item.item_name}</td>
+                  <td className="text-sm text-on-surface-variant">{item.unit}</td>
+                  <td>
+                    {editing === item.item_id ? (
+                      <div className="flex items-center gap-2">
+                        <input type="number" value={editQty} onChange={e => setEditQty(e.target.value)} autoFocus
+                          className="w-24 bg-surface-container-low border-none rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                        <button onClick={() => saveEdit(item.item_id)} disabled={saving} className="p-1.5 text-green-700 hover:bg-green-50 rounded-lg transition-colors">
+                          <span className="material-symbols-outlined text-lg">check</span>
+                        </button>
+                        <button onClick={() => setEditing(null)} className="p-1.5 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">
+                          <span className="material-symbols-outlined text-lg">close</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="font-mono font-bold text-sm">{item.quantity_in_stock}</span>
+                    )}
+                  </td>
+                  <td><span className={l.cls}>{l.label}</span></td>
+                  <td className="w-32">
+                    <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${l.bar}`} style={{ width: `${l.pct}%` }}></div>
+                    </div>
+                  </td>
+                  <td className="text-right">
+                    <button onClick={() => { setEditing(item.item_id); setEditQty(String(item.quantity_in_stock)); }}
+                      className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-fixed rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-lg">edit</span>
                     </button>
-                    <button onClick={() => setEditing(null)} className="p-2 text-gray-500 hover:bg-clinical-700 rounded-lg transition-colors">
-                      <X size={15} />
-                    </button>
-                  </>
-                ) : (
-                  <button onClick={() => startEdit(item)} className="p-2 text-gray-500 hover:text-clinical-accent hover:bg-clinical-700 rounded-lg transition-colors">
-                    <Edit2 size={15} />
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );

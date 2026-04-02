@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ClipboardCheck, CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
 import { careflowAPI } from '../../api/client';
 
-const STATUS_STYLES = {
-  Pending: 'text-clinical-warning bg-clinical-warning/10 border-clinical-warning/30',
-  Approved: 'text-clinical-success bg-clinical-success/10 border-clinical-success/30',
-  Rejected: 'text-clinical-danger bg-clinical-danger/10 border-clinical-danger/30',
-};
+const FILTERS = ['All', 'Pending', 'Approved', 'Rejected'];
 
 export default function AdminProposals() {
   const [proposals, setProposals] = useState([]);
@@ -14,77 +9,95 @@ export default function AdminProposals() {
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
-    careflowAPI.getAllProposals()
-      .then(r => setProposals(r.data))
-      .catch(() => setProposals([]))
-      .finally(() => setLoading(false));
+    careflowAPI.getAllProposals().then(r => setProposals(r.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const filtered = filter === 'All' ? proposals : proposals.filter(p => p.status === filter);
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold flex items-center gap-3">
-          <ClipboardCheck className="text-purple-400" size={26} /> All Proposals
-        </h2>
-        <p className="text-gray-400 mt-1">Complete history of all risk proposals and decisions.</p>
+        <h2 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">Proposal History</h2>
+        <p className="text-on-surface-variant mt-1">Complete audit of all AI-generated risk proposals and clinical decisions.</p>
       </div>
 
-      {/* Filter */}
-      <div className="flex gap-2">
-        {['All', 'Pending', 'Approved', 'Rejected'].map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === f ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-clinical-800 text-gray-400 border border-clinical-border hover:text-gray-200'
-            }`}
-          >
+      {/* Stats row */}
+      <div className="grid grid-cols-4 gap-4">
+        {[
+          { label: 'Total', value: proposals.length, color: 'text-on-surface' },
+          { label: 'Pending', value: proposals.filter(p=>p.status==='Pending').length, color: 'text-tertiary' },
+          { label: 'Approved', value: proposals.filter(p=>p.status==='Approved').length, color: 'text-green-700' },
+          { label: 'Rejected', value: proposals.filter(p=>p.status==='Rejected').length, color: 'text-error' },
+        ].map(s => (
+          <div key={s.label} className="stat-card text-center">
+            <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">{s.label}</p>
+            <p className={`font-headline text-3xl font-extrabold ${s.color}`}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter tabs */}
+      <div className="bg-surface-container p-1 rounded-lg flex gap-1 w-fit">
+        {FILTERS.map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`px-5 py-2 rounded-md text-xs font-bold transition-all ${filter === f ? 'bg-surface-container-lowest shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
             {f}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
-      ) : filtered.length === 0 ? (
-        <div className="glass-panel p-12 text-center text-gray-500">No proposals found.</div>
+        <div className="text-center py-16"><span className="material-symbols-outlined text-4xl animate-spin">progress_activity</span></div>
       ) : (
-        <div className="space-y-3">
-          {filtered.map(p => (
-            <div key={p.proposal_id} className="glass-panel p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1 flex-wrap">
-                    <span className="font-semibold text-gray-200">{p.patient_name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded border font-semibold ${STATUS_STYLES[p.status] || ''}`}>
+        <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 bg-primary-fixed border-b border-primary/10 flex items-center justify-between">
+            <h3 className="font-headline font-bold text-on-primary-fixed">
+              {filter === 'All' ? 'All Proposals' : `${filter} Proposals`}
+            </h3>
+            <span className="text-xs text-on-primary-fixed-variant font-bold">{filtered.length} records</span>
+          </div>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Action</th>
+                <th>Risk Score</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(p => (
+                <tr key={p.proposal_id}>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary-fixed text-primary flex items-center justify-center font-bold text-xs">
+                        {(p.patient_name||'P').charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold">{p.patient_name}</p>
+                        <p className="text-xs text-on-surface-variant">#{String(p.patient_id||'').padStart(5,'0')}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-sm text-on-surface-variant">{p.suggested_action}</td>
+                  <td><span className="font-mono font-bold text-sm text-error">{p.score}</span></td>
+                  <td>
+                    <span className={p.status==='Pending' ? 'chip-medium' : p.status==='Approved' ? 'chip-success' : 'chip-high'}>
                       {p.status}
                     </span>
-                    <span className="text-xs text-gray-500 bg-clinical-700 px-2 py-0.5 rounded">{p.suggested_action}</span>
-                  </div>
-                  <p className="text-sm text-gray-400">
-                    Patient ID: {String(p.patient_id || '').padStart(5,'0')} •
-                    Risk: <span className="font-mono text-clinical-warning">{p.score}</span>
-                  </p>
-                  {p.decision?.comment && (
-                    <div className="mt-2 flex items-start gap-2 bg-clinical-900/50 rounded-lg px-3 py-2 text-sm text-gray-300">
-                      <MessageSquare size={14} className="text-clinical-accent mt-0.5 shrink-0" />
-                      <span>{p.decision.comment}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-xs text-gray-500">{new Date(p.created_at).toLocaleString()}</p>
-                  {p.decision && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      Decided: {new Date(p.decision.decision_timestamp).toLocaleString()}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td className="text-sm text-on-surface-variant max-w-xs">
+                    {p.decision?.comment
+                      ? <span className="flex items-start gap-1"><span className="material-symbols-outlined text-sm text-primary">chat</span><span className="truncate">{p.decision.comment}</span></span>
+                      : <span className="text-outline">—</span>}
+                  </td>
+                  <td className="text-xs text-on-surface-variant whitespace-nowrap">{new Date(p.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

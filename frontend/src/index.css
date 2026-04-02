@@ -1,81 +1,140 @@
 @import "tailwindcss";
 
 @theme {
-  --color-clinical-900: #0B1120;
-  --color-clinical-800: #111827;
-  --color-clinical-700: #1F2937;
-  --color-clinical-border: #374151;
-  --color-clinical-accent: #3B82F6;
-  --color-clinical-success: #10B981;
-  --color-clinical-warning: #F59E0B;
-  --color-clinical-danger: #EF4444;
+  /* Clinical Ledger Design System */
+  --color-surface: #f7f9fb;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-surface-variant: #e0e3e5;
+
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #424752;
+  --color-on-background: #191c1e;
+  --color-background: #f7f9fb;
+
+  --color-primary: #00478d;
+  --color-primary-container: #005eb8;
+  --color-primary-fixed: #d6e3ff;
+  --color-primary-fixed-dim: #a9c7ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-fixed: #001b3d;
+  --color-on-primary-fixed-variant: #00468c;
+  --color-inverse-primary: #a9c7ff;
+
+  --color-secondary: #4a6178;
+  --color-secondary-container: #cae2fe;
+  --color-secondary-fixed: #cee5ff;
+  --color-secondary-fixed-dim: #b1c9e4;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-fixed: #021d31;
+  --color-on-secondary-fixed-variant: #32495f;
+  --color-on-secondary-container: #4e657c;
+
+  --color-tertiary: #793100;
+  --color-tertiary-container: #9f4300;
+  --color-tertiary-fixed: #ffdbcb;
+  --color-tertiary-fixed-dim: #ffb691;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-fixed: #341100;
+  --color-on-tertiary-fixed-variant: #793100;
+  --color-on-tertiary-container: #ffcfb9;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-outline: #727783;
+  --color-outline-variant: #c2c6d4;
+
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-surface-tint: #005db6;
 }
 
 @layer base {
   body {
-    @apply bg-clinical-900 text-gray-100 font-sans antialiased;
+    @apply bg-surface text-on-surface font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Manrope', sans-serif;
   }
 }
 
 @layer components {
+  .clinical-gradient {
+    background: linear-gradient(135deg, #00478d 0%, #005eb8 100%);
+  }
   .glass-panel {
-    @apply bg-clinical-800/80 backdrop-blur-md border border-clinical-border rounded-xl shadow-2xl;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
-  
-  .clinical-btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2;
-  }
-  
   .clinical-btn-primary {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 bg-clinical-accent text-white shadow-lg;
+    @apply px-4 py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-95;
+    background: linear-gradient(135deg, #00478d 0%, #005eb8 100%);
+    box-shadow: 0 4px 14px rgba(0, 71, 141, 0.2);
   }
-  .clinical-btn-primary:hover {
-    @apply bg-blue-600;
+  .clinical-btn-secondary {
+    @apply px-4 py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-surface-container-highest text-on-secondary-container hover:bg-surface-container-high;
   }
-  
-  .clinical-btn-success {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 bg-clinical-success text-white shadow-lg;
-  }
-  .clinical-btn-success:hover {
-    @apply bg-emerald-600;
-  }
-  
   .clinical-btn-danger {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 bg-clinical-danger text-white shadow-lg;
+    @apply px-4 py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-error text-on-error;
+    box-shadow: 0 4px 14px rgba(186, 26, 26, 0.2);
   }
-  .clinical-btn-danger:hover {
-    @apply bg-red-600;
+  .clinical-btn-ghost {
+    @apply px-4 py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all text-primary hover:bg-primary-fixed/30;
   }
-  
-  .clinical-btn-outline {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border border-clinical-border text-gray-300;
+  .stat-card {
+    @apply bg-surface-container-lowest rounded-xl p-6 shadow-sm;
   }
-  .clinical-btn-outline:hover {
-    @apply bg-clinical-700;
+  .data-table {
+    @apply w-full text-left border-collapse;
+  }
+  .data-table thead tr {
+    @apply bg-surface-container-low;
+  }
+  .data-table thead th {
+    @apply px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant;
+  }
+  .data-table tbody tr {
+    @apply hover:bg-surface-container-low transition-colors border-b border-outline-variant/10 last:border-0;
+  }
+  .data-table tbody td {
+    @apply px-6 py-4;
+  }
+  .chip-high {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-error-container text-error;
+  }
+  .chip-medium {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-tertiary-fixed text-on-tertiary-fixed-variant;
+  }
+  .chip-low {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary-container text-on-secondary-container;
+  }
+  .chip-success {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800;
+  }
+  .chip-warning {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-tertiary-fixed text-tertiary;
   }
 }
 
-/* Custom Scrollbar for premium feel */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #1F2937;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #374151;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c2c6d4; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #727783; }
 
 /* Animations */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out;
-}
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
