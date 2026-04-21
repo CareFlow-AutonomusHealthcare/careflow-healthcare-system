@@ -64,6 +64,17 @@ Login as `staff_coord` / `staff123`
 - Table of all patients currently in the system
 - Shows patient ID, chronic condition count, and active status
 
+### Manage Patients
+- Full CRUD interface for patient records
+- Searchable table with patient name, MRN, chronic conditions, and registration date
+- **Add Patient** — opens a modal to register a new patient with:
+  - Full name input
+  - Chronic condition management (custom text input + quick-add presets for 10 common conditions)
+  - Condition chips with inline removal
+- **Edit** — modify any patient's name or chronic conditions
+- **Delete** — permanently remove a patient (with confirmation dialog)
+- Summary badges show total patient count and high-risk patient count
+
 ### Staff & Doctor Presence
 - **Doctors section** — lists all doctors with specialty and on-shift/off-shift status
 - **Nursing Staff section** — lists all staff with shift type and presence status

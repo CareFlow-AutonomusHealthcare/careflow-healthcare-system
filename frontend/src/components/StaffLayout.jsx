@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 const NAV = [
   { icon: 'dashboard',      label: 'Dashboard',          path: '/staff/dashboard' },
   { icon: 'person',         label: 'Present Patients',   path: '/staff/patients' },
+  { icon: 'edit_note',      label: 'Manage Patients',    path: '/staff/manage-patients' },
   { icon: 'badge',          label: 'Staff & Doctors',    path: '/staff/presence' },
   { icon: 'task_alt',       label: 'Approved Decisions', path: '/staff/decisions' },
 ];

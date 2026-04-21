@@ -14,6 +14,7 @@ import DoctorProposals from './pages/doctor/DoctorProposals';
 
 import StaffDashboard from './pages/staff/StaffDashboard';
 import PresentPatients from './pages/staff/PresentPatients';
+import PatientManagement from './pages/staff/PatientManagement';
 import StaffPresence from './pages/staff/StaffPresence';
 import ApprovedDecisions from './pages/staff/ApprovedDecisions';
 
@@ -65,6 +66,7 @@ function AppRoutes() {
           <Route path="/" element={<Navigate to="/staff/dashboard" replace />} />
           <Route path="/staff/dashboard" element={<StaffDashboard />} />
           <Route path="/staff/patients" element={<PresentPatients />} />
+          <Route path="/staff/manage-patients" element={<PatientManagement />} />
           <Route path="/staff/presence" element={<StaffPresence />} />
           <Route path="/staff/decisions" element={<ApprovedDecisions />} />
           <Route path="*" element={<Navigate to="/staff/dashboard" replace />} />

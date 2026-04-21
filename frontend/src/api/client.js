@@ -27,6 +27,9 @@ export const careflowAPI = {
   listPatients: () => api.get('/patients'),
   getPatientHistory: (patientId, windowDays = 90) =>
     api.get(`/patients/${patientId}/history?window_days=${windowDays}`),
+  createPatient: (data) => api.post('/patients', data),
+  updatePatient: (patientId, data) => api.put(`/patients/${patientId}`, data),
+  deletePatient: (patientId) => api.delete(`/patients/${patientId}`),
 
   // Risk Engine
   triggerBatchScoring: () => api.post('/engine/batch-score'),

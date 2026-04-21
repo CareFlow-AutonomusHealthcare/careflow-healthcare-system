@@ -198,6 +198,56 @@ def get_patient_history(
 
 
 # ==========================================
+# PATIENT MANAGEMENT (STAFF + ADMIN)
+# ==========================================
+
+@app.post("/patients", response_model=schemas.Patient, status_code=201)
+def create_patient(
+    patient_in: schemas.PatientCreate,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_role(models.UserRole.staff, models.UserRole.admin))
+):
+    patient = models.Patient(
+        full_name=patient_in.full_name,
+        chronic_conditions=patient_in.chronic_conditions,
+    )
+    db.add(patient)
+    db.commit()
+    db.refresh(patient)
+    return patient
+
+
+@app.put("/patients/{patient_id}", response_model=schemas.Patient)
+def update_patient(
+    patient_id: int,
+    patient_in: schemas.PatientCreate,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_role(models.UserRole.staff, models.UserRole.admin))
+):
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    patient.full_name = patient_in.full_name
+    patient.chronic_conditions = patient_in.chronic_conditions
+    db.commit()
+    db.refresh(patient)
+    return patient
+
+
+@app.delete("/patients/{patient_id}", status_code=204)
+def delete_patient(
+    patient_id: int,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_role(models.UserRole.staff, models.UserRole.admin))
+):
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    db.delete(patient)
+    db.commit()
+
+
+# ==========================================
 # RISK ENGINE & PROPOSALS
 # ==========================================
 
