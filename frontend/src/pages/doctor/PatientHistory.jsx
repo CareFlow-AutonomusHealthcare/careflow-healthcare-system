@@ -74,6 +74,7 @@ export default function PatientHistory() {
     setLoading(true);
     try {
       const res = await careflowAPI.getPatientHistory(patient.patient_id, window);
+      console.log('PROPOSAL DEBUG:', JSON.stringify({ proposal: res.data.proposal, risk_score: res.data.risk_score, has_proposal: !!res.data.proposal }, null, 2));
       setHistory(res.data);
     } catch { setHistory({ labs: [], appointments: [] }); }
     finally { setLoading(false); }
@@ -273,11 +274,15 @@ export default function PatientHistory() {
                     <div className="bg-surface-container-low p-5 rounded-xl">
                       <h4 className="text-sm font-bold text-on-surface mb-2">Detected Risk Pattern</h4>
                       <p className="text-base font-semibold text-primary leading-snug">
-                        {isHighRisk
-                          ? `Patient shows elevated risk indicators across ${conds.length} chronic conditions with increasing clinical instability.`
-                          : conds.length > 0
-                          ? `Patient has ${conds.length} chronic condition${conds.length > 1 ? 's' : ''} requiring ongoing monitoring and periodic review.`
-                          : 'Patient currently shows stable indicators. Continued monitoring recommended.'}
+                        {history?.risk_score
+                          ? `Patient risk score is ${history.risk_score.composite_score.toFixed(2)}. ${
+                              history.risk_score.composite_score >= 9.0 
+                                ? 'Patient is HIGH RISK. Escalate immediately.' 
+                                : history.risk_score.composite_score >= 5.0 
+                                  ? 'Patient requires follow-up. Moderate risk detected.' 
+                                  : 'No action required. Patient is low risk.'
+                            }`
+                          : 'Patient currently shows stable indicators or risk engine has not been run. Continued monitoring recommended.'}
                       </p>
                     </div>
 
@@ -285,10 +290,10 @@ export default function PatientHistory() {
                       <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/20 pb-2">Clinical Rationale</h4>
                       <div className="grid grid-cols-2 gap-4">
                         {[
+                          { icon: 'history_edu', title: 'Reasoning Breakdown', desc: history?.risk_score ? history.risk_score.reasoning_string.split('|').join(', ') : 'N/A' },
                           { icon: 'calendar_month', title: 'Appointment Adherence', desc: `${totalApts - missedCount} of ${totalApts} appointments attended in the observation window.` },
                           { icon: 'biotech', title: 'Lab Trend', desc: `${history?.labs?.length || 0} lab records analyzed over the ${window}-day window.` },
                           { icon: 'medication', title: 'Chronic Conditions', desc: conds.length > 0 ? `Active: ${conds.slice(0, 2).map(c => c.replace(/_/g, ' ')).join(', ')}${conds.length > 2 ? ` +${conds.length - 2} more` : ''}.` : 'No chronic conditions on record.' },
-                          { icon: 'history_edu', title: 'Risk Score Basis', desc: `Composite score derived from engagement, clinical, chronic, and instability factors.` },
                         ].map((r, i) => (
                           <div key={i} className="flex gap-3">
                             <span className="material-symbols-outlined text-primary text-xl shrink-0 mt-0.5">{r.icon}</span>
@@ -329,16 +334,17 @@ export default function PatientHistory() {
                     <p className="text-xs text-on-surface-variant mt-0.5">Review and submit your clinical decision for this patient.</p>
                   </div>
                   <div className="flex gap-3 shrink-0">
-                    <button onClick={() => setCommentModal('Rejected')} className="px-5 py-2.5 bg-error text-on-error rounded-lg font-bold text-sm shadow-lg active:scale-95 transition-all">
+                    <button onClick={() => history?.proposal ? setCommentModal('Rejected') : alert('No pending proposal for this patient.')} className="px-5 py-2.5 bg-error text-on-error rounded-lg font-bold text-sm shadow-lg active:scale-95 transition-all disabled:opacity-50" disabled={!history?.proposal}>
                       Reject
                     </button>
-                    <button onClick={() => setCommentModal('Approved')} className="px-5 py-2.5 bg-secondary-container text-on-secondary-container rounded-lg font-bold text-sm hover:bg-secondary-fixed active:scale-95 transition-all">
+                    <button onClick={() => history?.proposal ? setCommentModal('Approved') : alert('No pending proposal for this patient.')} className="px-5 py-2.5 bg-secondary-container text-on-secondary-container rounded-lg font-bold text-sm hover:bg-secondary-fixed active:scale-95 transition-all disabled:opacity-50" disabled={!history?.proposal}>
                       Approve with Comments
                     </button>
                     <button
-                      className="px-6 py-2.5 text-white rounded-lg font-bold text-sm shadow-lg active:scale-95 transition-all"
+                      className="px-6 py-2.5 text-white rounded-lg font-bold text-sm shadow-lg active:scale-95 transition-all disabled:opacity-50"
                       style={{ background: 'linear-gradient(135deg, #00478d 0%, #005eb8 100%)' }}
-                      onClick={() => alert('No pending proposal for this patient. Run the risk engine first.')}
+                      onClick={() => history?.proposal ? decide(history.proposal.proposal_id, 'Approved') : alert('No pending proposal for this patient. Run the risk engine first.')}
+                      disabled={!history?.proposal || decidingId === history?.proposal?.proposal_id}
                     >
                       Approve
                     </button>
@@ -423,10 +429,14 @@ export default function PatientHistory() {
               <div className="flex gap-3">
                 <button
                   onClick={() => {
-                    if (commentText.trim()) {
-                      setComments(prev => [{ author: user?.full_name || 'Doctor', text: commentText, time: 'Just now', isPrimary: true }, ...prev]);
+                    if (history?.proposal) {
+                      if (commentText.trim()) {
+                        setComments(prev => [{ author: user?.full_name || 'Doctor', text: commentText, time: 'Just now', isPrimary: true }, ...prev]);
+                      }
+                      decide(history.proposal.proposal_id, commentModal, commentText);
+                    } else {
+                      setCommentModal(null); setCommentText('');
                     }
-                    setCommentModal(null); setCommentText('');
                   }}
                   className={`flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${commentModal === 'Approved' ? 'text-white' : 'bg-error text-on-error'}`}
                   style={commentModal === 'Approved' ? { background: 'linear-gradient(135deg, #00478d 0%, #005eb8 100%)' } : {}}
