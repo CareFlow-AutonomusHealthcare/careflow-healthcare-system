@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: careflow_db
+      MYSQL_USER: careflow_user
+      MYSQL_PASSWORD: careflow_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
