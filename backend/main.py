@@ -517,3 +517,5 @@ def get_nursing_staff(
 @app.get("/")
 def read_root():
     return {"message": "Welcome to CareFlow API v2"}
+
+

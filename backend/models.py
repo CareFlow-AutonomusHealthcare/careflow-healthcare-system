@@ -160,7 +160,7 @@ class ActionProposal(Base):
     __tablename__ = "action_proposals"
     proposal_id = Column(Integer, primary_key=True, index=True)
     score_id = Column(Integer, ForeignKey("risk_scores.score_id", ondelete="CASCADE"), nullable=False, unique=True)
-    suggested_action = Column(Enum(ActionType), nullable=False)
+    suggested_action = Column(Enum(ActionType, values_callable=lambda obj: [e.value for e in obj]), nullable=False)
     status = Column(Enum(ProposalStatus), default=ProposalStatus.Pending)
     created_at = Column(DateTime, default=func.now())
 

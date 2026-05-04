@@ -119,11 +119,11 @@ class ActionProposal(ActionProposalBase):
 class DecisionBase(BaseModel):
     approver_id: int
     approver_type: ApproverType
-    action: ProposalStatus # Approve or Reject
     comment: Optional[str] = None
 
 class DecisionCreate(DecisionBase):
     proposal_id: int
+    action: ProposalStatus # Approve or Reject
 
 class Decision(DecisionBase):
     decision_id: int
