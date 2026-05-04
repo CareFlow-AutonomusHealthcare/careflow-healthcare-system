@@ -3,7 +3,6 @@ import Sidebar from './Sidebar';
 
 const NAV = [
   { icon: 'dashboard',      label: 'Dashboard',        path: '/admin/dashboard' },
-  { icon: 'person',         label: 'Patients',         path: '/admin/patients' },
   { icon: 'description',    label: 'All Proposals',    path: '/admin/proposals' },
   { icon: 'group',          label: 'User Management',  path: '/admin/users' },
   { icon: 'inventory_2',    label: 'Inventory',        path: '/admin/inventory' },

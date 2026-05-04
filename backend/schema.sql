@@ -213,15 +213,14 @@ DELIMITER ;
 
 -- =========================================================================
 -- 5. DEFAULT SEED USERS
--- Credentials:
---   admin    / admin123
---   dr_smith / doctor123
---   dr_jones / doctor123
+-- Passwords are hashed with bcrypt at runtime.
+-- Run the seeder script to create default users:
+--   Windows:     python backend\seed_users.py
+--   Linux/macOS: python3 backend/seed_users.py
+--
+-- Default credentials after seeding:
+--   admin       / admin123
+--   dr_smith    / doctor123
+--   dr_jones    / doctor123
 --   staff_coord / staff123
 -- =========================================================================
-
-INSERT IGNORE INTO users (username, full_name, hashed_password, role, linked_id) VALUES
-('admin',       'System Administrator',  'admin123',  'admin',  NULL),
-('dr_smith',    'Dr. Sarah Smith',       'doctor123', 'doctor', 1),
-('dr_jones',    'Dr. Marcus Jones',      'doctor123', 'doctor', 2),
-('staff_coord', 'Coordinator Lisa Chen', 'staff123',  'staff',  1);

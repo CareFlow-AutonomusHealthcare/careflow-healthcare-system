@@ -8,19 +8,35 @@ CareFlow has three completely separate portals, each with a unique interface and
 
 ## Starting the System
 
-**Terminal 1 — Backend API:**
-```bash
-cd ~/Desktop/careflow
-backend/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+### 1. Database
+Ensure your MySQL service (e.g., XAMPP or Docker) is running. If using XAMPP, ensure a `.env` file exists in the root with:
+```env
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_HOST=localhost
+MYSQL_DATABASE=careflow_db
 ```
 
-**Terminal 2 — Frontend:**
+### 2. Backend API
+**Windows (PowerShell):**
+```powershell
+backend\venv\Scripts\activate
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+**Linux / macOS:**
 ```bash
-cd ~/Desktop/careflow/frontend
+source backend/venv/bin/activate
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+### 3. Frontend Portal
+Navigate to the `frontend` folder and run:
+```bash
+npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` (or `5174` if 5173 is in use).
+Open `http://localhost:5173`.
 
 ---
 
@@ -144,9 +160,8 @@ Only one pending proposal per patient is allowed at a time.
 ## Seeding Test Data
 
 To reset and repopulate all dummy data:
-```bash
-backend/venv/bin/python3 backend/seed_data.py
-```
+- **Windows:** `python backend\seed_data.py`
+- **Linux/macOS:** `python3 backend/seed_data.py`
 
 This creates:
 - 100 patients (20 high-risk, 35 moderate, 45 low)
@@ -161,17 +176,11 @@ After seeding, log in as admin and click **Run Risk Engine** to generate proposa
 
 ## Database
 
-MySQL running locally on port 3306.
+The project uses a MySQL database. You can configure credentials in the `.env` file.
 
-```
-Host:     localhost
-Database: careflow_db
-User:     careflow_user
-Password: careflow_password
-```
-
-To reset the entire database:
-```bash
-sudo mysql careflow_db < backend/schema.sql
-backend/venv/bin/python3 backend/seed_data.py
-```
+**To reset the entire database tables:**
+1. Log into your MySQL terminal.
+2. Run `CREATE DATABASE IF NOT EXISTS careflow_db;`.
+3. Import the schema file:
+   - **Windows:** `cmd /c 'mysql -u root -p careflow_db < backend\schema.sql'`
+   - **Linux/macOS:** `mysql -u root -p careflow_db < backend/schema.sql`

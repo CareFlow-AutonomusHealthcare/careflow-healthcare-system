@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 from typing import List, Dict
 from datetime import datetime, timedelta
 import random
@@ -38,6 +38,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=401, detail="Invalid username or password")
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account is disabled")
+
+    # Auto-migrate legacy plain-text passwords to bcrypt on successful login
+    if not user.hashed_password.startswith(("$2b$", "$2a$", "$2y$")):
+        user.hashed_password = hash_password(form_data.password)
+        db.commit()
+
     token = create_access_token({"sub": str(user.user_id), "role": user.role})
     return {"access_token": token, "token_type": "bearer", "user": user}
 
@@ -190,10 +196,22 @@ def get_patient_history(
         models.Appointment.scheduled_at >= cutoff_date
     ).order_by(models.Appointment.scheduled_at.desc()).all()
 
+    recent_score = db.query(models.RiskScore).filter(
+        models.RiskScore.patient_id == patient_id
+    ).order_by(models.RiskScore.calculated_at.desc()).first()
+
+    all_score_ids = [s.score_id for s in db.query(models.RiskScore.score_id).filter(models.RiskScore.patient_id == patient_id).all()]
+    proposal = db.query(models.ActionProposal).filter(
+        models.ActionProposal.score_id.in_(all_score_ids),
+        models.ActionProposal.status == models.ProposalStatus.Pending
+    ).order_by(models.ActionProposal.created_at.desc()).first()
+
     return {
-        "patient": schemas.Patient.from_orm(patient),
-        "labs": [schemas.Lab.from_orm(l) for l in labs],
-        "appointments": [schemas.Appointment.from_orm(a) for a in appointments]
+        "patient": schemas.Patient.model_validate(patient),
+        "labs": [schemas.Lab.model_validate(l) for l in labs],
+        "appointments": [schemas.Appointment.model_validate(a) for a in appointments],
+        "risk_score": schemas.RiskScore.model_validate(recent_score) if recent_score else None,
+        "proposal": schemas.ActionProposal.model_validate(proposal) if proposal else None
     }
 
 
@@ -257,13 +275,14 @@ def trigger_batch_risk_scoring(
     _: models.User = Depends(require_role(models.UserRole.doctor, models.UserRole.admin))
 ):
     cutoff = datetime.now() - timedelta(days=90)
+    cutoff_30 = datetime.now() - timedelta(days=30)
     patients = db.query(models.Patient).all()
     results = []
 
     for p in patients:
         apps = db.query(models.Appointment).filter(
             models.Appointment.patient_id == p.patient_id,
-            models.Appointment.scheduled_at >= cutoff
+            models.Appointment.scheduled_at >= cutoff_30
         ).all()
         missed = sum(1 for a in apps if a.status == models.AppointmentStatus.Missed)
         total_apps = len(apps)
@@ -273,12 +292,33 @@ def trigger_batch_risk_scoring(
             models.Lab.patient_id == p.patient_id,
             models.Lab.recorded_at >= cutoff
         ).all()
+        
         clin_factor = 0
-        if len(labs) > 1:
-            vals = [l.test_value for l in labs]
-            clin_factor = min((max(vals) - min(vals)) / max(vals) * 10, 5) if max(vals) > 0 else 0
+        abnormal_readings = 0
+        total_readings = 0
+        for l in labs:
+            test_type = l.test_type.lower() if l.test_type else ""
+            if test_type == "glucose":
+                total_readings += 1
+                if not (70 <= l.test_value <= 140):
+                    abnormal_readings += 1
+            elif test_type == "hemoglobin":
+                total_readings += 1
+                if not (7 <= l.test_value <= 17):
+                    abnormal_readings += 1
+                    
+        if total_readings > 0:
+            clin_factor = min((abnormal_readings / total_readings) * 5, 5)
 
-        chron_factor = len(p.chronic_conditions.keys()) if p.chronic_conditions else 0
+        conds = p.chronic_conditions
+        if isinstance(conds, str):
+            import json
+            try:
+                conds = json.loads(conds)
+            except:
+                conds = {}
+        
+        chron_factor = min(len(conds.keys()) if isinstance(conds, dict) else 0, 5)
 
         last_interaction = max([l.recorded_at for l in labs] + [datetime.min])
         days_since = (datetime.now() - last_interaction).days
@@ -315,14 +355,29 @@ def trigger_batch_risk_scoring(
     return {"calculated": len(patients), "new_proposals": len(results), "details": results}
 
 
-@app.get("/proposals", response_model=List[schemas.ActionProposal])
+@app.get("/proposals")
 def get_pending_proposals(
     db: Session = Depends(get_db),
     _: models.User = Depends(get_current_user)
 ):
-    return db.query(models.ActionProposal).filter(
+    proposals = db.query(models.ActionProposal).filter(
         models.ActionProposal.status == models.ProposalStatus.Pending
     ).all()
+    result = []
+    for p in proposals:
+        score = db.query(models.RiskScore).filter(models.RiskScore.score_id == p.score_id).first()
+        patient = db.query(models.Patient).filter(models.Patient.patient_id == score.patient_id).first() if score else None
+        result.append({
+            "proposal_id": p.proposal_id,
+            "patient_name": patient.full_name if patient else "Unknown",
+            "patient_id": score.patient_id if score else None,
+            "score": score.composite_score if score else None,
+            "reason": score.reasoning_string if score else None,
+            "suggested_action": p.suggested_action,
+            "status": p.status,
+            "created_at": p.created_at
+        })
+    return result
 
 
 @app.get("/proposals/all")

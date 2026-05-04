@@ -14,12 +14,23 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
+import bcrypt
+
+
 def hash_password(password: str) -> str:
-    # No encryption — store plain text
-    return password
+    """Hash a plain-text password using bcrypt."""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 
 def verify_password(plain: str, stored: str) -> bool:
+    """Verify a plain-text password against a bcrypt hash.
+    Also handles legacy plain-text passwords by checking for a direct match
+    and automatically returning True so the caller can proceed.
+    """
+    # If the stored value is a bcrypt hash (starts with $2b$ or $2a$), use bcrypt
+    if stored.startswith(("$2b$", "$2a$", "$2y$")):
+        return bcrypt.checkpw(plain.encode('utf-8'), stored.encode('utf-8'))
+    # Legacy fallback: plain-text comparison for un-migrated passwords
     return plain == stored
 
 

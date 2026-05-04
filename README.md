@@ -81,30 +81,59 @@ Thresholds: Score ≥ 9.0 → Escalate | Score ≥ 5.0 → Follow-up
 ## ⚡ Quick Start
 
 ### Prerequisites
-- Python 3.11
-- Node.js 18+
-- MySQL 8.0 running locally
+- **Python 3.11+**
+- **Node.js 18+**
+- **MySQL 8.0** (or XAMPP/Docker)
 
-### 1. Database Setup
-```bash
-sudo mysql -e "
-CREATE DATABASE IF NOT EXISTS careflow_db;
-CREATE USER IF NOT EXISTS 'careflow_user'@'localhost' IDENTIFIED BY 'careflow_password';
-GRANT ALL PRIVILEGES ON careflow_db.* TO 'careflow_user'@'localhost';
-FLUSH PRIVILEGES;
-"
-sudo mysql careflow_db < backend/schema.sql
-```
+---
+
+### 1. Database Setup 
+#### Manual Setup (XAMPP or Native)
+1. **Start MySQL:** Open your XAMPP Control Panel and start the MySQL module (or ensure your native MySQL service is running).
+2. Create a `.env` file in the project root:
+   ```env
+   MYSQL_USER=root
+   MYSQL_PASSWORD=your_password
+   MYSQL_HOST=localhost
+   MYSQL_DATABASE=careflow_db
+   ```
+2. Run these SQL commands in your MySQL terminal:
+   ```sql
+   CREATE DATABASE careflow_db;
+   ```
+3. Import the schema:
+   - **Windows:** `cmd /c 'mysql -u root -p careflow_db < backend\schema.sql'`
+   - **Linux/macOS:** `mysql -u root -p careflow_db < backend/schema.sql`
+
+---
 
 ### 2. Start Backend (Terminal 1)
-```bash
-cd ~/Desktop/careflow
-backend/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+
+**On Windows (PowerShell):**
+```powershell
+python -m venv backend\venv
+backend\venv\Scripts\activate
+pip install -r backend\requirements.txt
+pip install pymysql
+$env:PYTHONIOENCODING="utf-8"; python backend\seed_data.py  # Optional: Seeds demo data
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
+
+**On Linux/macOS:**
+```bash
+python3 -m venv backend/venv
+source backend/venv/bin/activate
+pip install -r backend/requirements.txt
+python backend/seed_data.py
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+---
 
 ### 3. Start Frontend (Terminal 2)
 ```bash
-cd ~/Desktop/careflow/frontend
+cd frontend
+npm install
 npm run dev
 ```
 
@@ -128,9 +157,13 @@ http://localhost:5173
 
 ## 🌱 Seed Dummy Data
 
-To populate 100 patients, 20 doctors, 70 staff, and full inventory:
+To populate 100 patients, 20 doctors, 70 staff, full inventory, and default users:
 ```bash
+# On Linux/macOS
 backend/venv/bin/python3 backend/seed_data.py
+
+# On Windows (PowerShell)
+$env:PYTHONIOENCODING="utf-8"; python backend\seed_data.py
 ```
 
 Then log in as admin and click **Run Risk Engine** to generate proposals.
