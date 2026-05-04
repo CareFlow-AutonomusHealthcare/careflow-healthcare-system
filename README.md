@@ -97,12 +97,22 @@ Thresholds: Score ≥ 9.0 → Escalate | Score ≥ 5.0 → Follow-up
    MYSQL_HOST=localhost
    MYSQL_DATABASE=careflow_db
    ```
-2. Run these SQL commands in your MySQL terminal:
+3. Create a fresh database from your IDE terminal. If the mysql command isn't recognized, use  the XAMPP absolute paths below:
+```
+Windows (XAMPP): C:\xampp\mysql\bin\mysql.exe -u root
+```
+```
+Linux/macOS: mysql -u root (or /Applications/XAMPP/bin/mysql -u root)
+```
+Once inside the MySQL prompt, run the following to ensure a completely clean slate:
    ```sql
+   DROP DATABASE IF EXISTS careflow_db;
    CREATE DATABASE careflow_db;
+exit;
    ```
-3. Import the schema:
-   - **Windows:** `cmd /c 'mysql -u root -p careflow_db < backend\schema.sql'`
+4. Import the schema:
+   - **Windows(CMD):** `cmd /c 'mysql -u root -p careflow_db < backend\schema.sql'`
+   - **Windows(PowerShell):**`Get-Content backend\schema.sql | C:\xampp\mysql\bin\mysql.exe -u root careflow_db`
    - **Linux/macOS:** `mysql -u root -p careflow_db < backend/schema.sql`
 
 ---
@@ -115,7 +125,7 @@ python -m venv backend\venv
 backend\venv\Scripts\activate
 pip install -r backend\requirements.txt
 pip install pymysql
-$env:PYTHONIOENCODING="utf-8"; python backend\seed_data.py  # Optional: Seeds demo data
+$env:PYTHONIOENCODING="utf-8"; python backend\seed_data.py 
 uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
